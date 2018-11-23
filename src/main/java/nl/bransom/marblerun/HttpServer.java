@@ -1,8 +1,8 @@
 package nl.bransom.marblerun;
 
+import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
-import io.vertx.rxjava.core.AbstractVerticle;
-import io.vertx.rxjava.core.http.HttpServerRequest;
+import io.vertx.ext.web.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,23 +13,24 @@ public class HttpServer extends AbstractVerticle {
 
   @Override
   public void start(final Future<Void> result) {
+    final var router = Router.router(vertx);
+
+    router.get("/").handler(routingContext ->
+        routingContext
+            .response()
+            .end("<h1>Hello from " + Thread.currentThread().getName() + "</h1>"));
+
     vertx
         .createHttpServer()
-        .requestHandler(this::respond)
-        .listen(PORT, startResult -> {
-          if (startResult.succeeded()) {
+        .requestHandler(router::accept)
+        .listen(PORT, listenResult -> {
+          if (listenResult.succeeded()) {
             LOG.info("{} is listening on http://localhost:{}/", getClass().getSimpleName(), PORT);
             result.complete();
           } else {
-            LOG.error("Error starting HTTP server", startResult.cause());
-            result.fail(startResult.cause());
+            LOG.error("Error starting HTTP server", listenResult.cause());
+            result.fail(listenResult.cause());
           }
         });
-  }
-
-  private void respond(final HttpServerRequest request) {
-    request
-        .response()
-        .end("<h1>Hello from " + Thread.currentThread().getName() + "</h1>");
   }
 }

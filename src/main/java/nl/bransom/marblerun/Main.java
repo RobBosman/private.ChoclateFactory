@@ -29,11 +29,11 @@ public class Main {
     // NOTE - log published messages only!
 //    vertx.eventBus()
 //        .addInterceptor(context -> LOG.debug("EVENT '{}' = {}", context.message().address(), context.message().body()));
-    vertx.setTimer(30000, timerId -> {
-      vertx.close();
-      LOG.info("And... it's gone!");
-      System.exit(0);
-    });
+//    vertx.setTimer(30000, timerId -> {
+//      vertx.close();
+//      LOG.info("And... it's gone!");
+//      System.exit(0);
+//    });
   }
 
   private static Future<Void> deployVerticle(final Vertx vertx, final String verticleName) {
