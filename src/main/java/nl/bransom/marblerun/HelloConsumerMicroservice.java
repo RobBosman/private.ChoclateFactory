@@ -3,7 +3,6 @@ package nl.bransom.marblerun;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava.core.AbstractVerticle;
-import io.vertx.rxjava.core.eventbus.EventBus;
 import io.vertx.rxjava.core.eventbus.Message;
 import io.vertx.rxjava.core.http.HttpServerRequest;
 import org.slf4j.Logger;
@@ -35,20 +34,10 @@ public class HelloConsumerMicroservice extends AbstractVerticle {
   }
 
   private void invokeService(final HttpServerRequest httpRequest) {
-    final EventBus eventBus = vertx.eventBus();
-
-    final Single<String> lukeSingle = eventBus
-        .<JsonObject>rxSend(HelloMicroservice.ADDRESS, "Luke")
-        .map(Message::body)
-        .map(this::composeResponse);
-    final Single<String> leiaSingle = eventBus
-        .<JsonObject>rxSend(HelloMicroservice.ADDRESS, "Leia")
-        .map(Message::body)
-        .map(this::composeResponse);
-
-    Single.zip(lukeSingle, leiaSingle,
-        (lukeResponse, leiaResponse) -> {
-          // We have the result of both requests
+    Single.zip(
+        rxSendMessage("Luke"),
+        rxSendMessage("Leia"),
+        (lukeResponse, leiaResponse) -> { // combine both requests
           return new JsonObject()
               .put("luke", lukeResponse)
               .put("leia", leiaResponse);
@@ -61,7 +50,10 @@ public class HelloConsumerMicroservice extends AbstractVerticle {
                 .end(t.getMessage()));
   }
 
-  private String composeResponse(final JsonObject json) {
-    return json.getString(HelloMicroservice.MESSAGE_KEY) + " from " + json.getString(HelloMicroservice.SERVED_BY_KEY);
+  private Single<String> rxSendMessage(final String body) {
+    return vertx.eventBus()
+        .<JsonObject>rxSend(HelloMicroservice.ADDRESS, body)
+        .map(Message::body)
+        .map(json -> json.getString(HelloMicroservice.MESSAGE_KEY) + " from " + json.getString(HelloMicroservice.SERVED_BY_KEY));
   }
 }

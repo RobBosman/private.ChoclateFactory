@@ -1,9 +1,7 @@
 package nl.bransom.marblerun;
 
-import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,14 +13,12 @@ public class Main {
   public static void main(final String[] args) {
     final Vertx vertx = Vertx.vertx();
 
-    final Future<Void> whenHelloMicroserviceIsDeployed = Future.future();
-    final Future<Void> whenHelloConsumerMicroserviceIsDeployed = Future.future();
-
-    vertx.deployVerticle(HelloMicroservice.class.getName(), toAsyncResultHandler(whenHelloMicroserviceIsDeployed));
-    vertx.deployVerticle(HelloConsumerMicroservice.class.getName(), toAsyncResultHandler(whenHelloConsumerMicroserviceIsDeployed));
-
     CompositeFuture
-        .all(whenHelloMicroserviceIsDeployed, whenHelloConsumerMicroserviceIsDeployed)
+        .all(
+            deployVerticle(vertx, HelloMicroservice.class.getName()),
+//            deployVerticle(vertx, HelloMicroservice.class.getName()),
+//            deployVerticle(vertx, HelloMicroservice.class.getName()),
+            deployVerticle(vertx, HelloConsumerMicroservice.class.getName()))
         .setHandler(result -> {
           if (result.succeeded()) {
             LOG.info("We have hyperdrive, captain.");
@@ -30,7 +26,6 @@ public class Main {
             LOG.error("Error", result.cause());
           }
         });
-
 
     // Log published messages only!
 //    vertx.eventBus()
@@ -42,13 +37,16 @@ public class Main {
     });
   }
 
-  private static Handler<AsyncResult<String>> toAsyncResultHandler(final Future<Void> result) {
-    return deployResult -> {
-      if (deployResult.succeeded()) {
-        result.complete();
-      } else {
-        result.fail(deployResult.cause());
-      }
-    };
+  private static Future<Void> deployVerticle(final Vertx vertx, final String verticleName) {
+    final Future<Void> result = Future.future();
+    vertx.deployVerticle(verticleName,
+        deployResult -> {
+          if (deployResult.succeeded()) {
+            result.complete();
+          } else {
+            result.fail(deployResult.cause());
+          }
+        });
+    return result;
   }
 }
