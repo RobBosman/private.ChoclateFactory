@@ -45,8 +45,8 @@ public class HelloConsumerMicroservice extends AbstractVerticle {
     LOG.debug("Processing HTTP request");
 
     // Send the request messages...
-    Single<String> lukeSingle = rxSendMessage("Luke");
-    Single<String> leiaSingle = rxSendMessage("Leia");
+    final var lukeSingle = rxSendMessage("Luke");
+    final var leiaSingle = rxSendMessage("Leia");
 
     // ...and combine the responses
     Single.zip(
@@ -55,8 +55,8 @@ public class HelloConsumerMicroservice extends AbstractVerticle {
         (lukeResponse, leiaResponse) -> new JsonObject()
             .put("luke", lukeResponse)
             .put("leia", leiaResponse))
-        .timeout(1000, TimeUnit.MILLISECONDS)
-        .retry()
+        .timeout(100, TimeUnit.MILLISECONDS)
+        .retry(9)
         .map(JsonObject::encodePrettily)
         .subscribe(
             routingContext.response()::end,
@@ -69,9 +69,9 @@ public class HelloConsumerMicroservice extends AbstractVerticle {
     return vertx
         .eventBus()
         .<JsonObject>rxSend(HelloMicroservice.ADDRESS, body)
-        .timeout(100, TimeUnit.MILLISECONDS)
-        .retry()
         .map(Message::body)
-        .map(json -> json.getString(HelloMicroservice.MESSAGE_KEY) + " from " + json.getString(HelloMicroservice.SERVED_BY_KEY));
+        .map(json -> json.getString(HelloMicroservice.MESSAGE_KEY)
+            + " from " + json.getString(HelloMicroservice.SERVED_BY_KEY)
+            + " at " + json.getString(HelloMicroservice.AT_KEY));
   }
 }

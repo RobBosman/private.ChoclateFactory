@@ -26,8 +26,9 @@ public class Main {
           }
         });
 
-    // NOTE - log published messages only!
-//    vertx.eventBus()
+    // NOTE - do NOT log 'sent' messages; only log 'published' messages!
+//    vertx
+//        .eventBus()
 //        .addInterceptor(context -> LOG.debug("EVENT '{}' = {}", context.message().address(), context.message().body()));
 //    vertx.setTimer(30000, timerId -> {
 //      vertx.close();
