@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 
 public class HttpServer extends AbstractVerticle {
 
-  private static final Logger LOG = LoggerFactory.getLogger(HttpServer.class);
   static final int PORT = 8080;
+  private static final Logger LOG = LoggerFactory.getLogger(HttpServer.class);
 
   @Override
   public void start(final Future<Void> result) {
@@ -18,7 +18,7 @@ public class HttpServer extends AbstractVerticle {
         .requestHandler(this::respond)
         .listen(PORT, startResult -> {
           if (startResult.succeeded()) {
-            LOG.info("HTTP server running on http://localhost:" + PORT + "/");
+            LOG.info("running " + getClass().getSimpleName() + " on http://localhost:" + PORT + "/");
             result.complete();
           } else {
             LOG.error("Error starting HTTP server", startResult.cause());
