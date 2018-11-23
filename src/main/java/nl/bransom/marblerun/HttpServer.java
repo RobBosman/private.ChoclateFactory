@@ -18,7 +18,7 @@ public class HttpServer extends AbstractVerticle {
         .requestHandler(this::respond)
         .listen(PORT, startResult -> {
           if (startResult.succeeded()) {
-            LOG.info("running " + getClass().getSimpleName() + " on http://localhost:" + PORT + "/");
+            LOG.info("{} is listening on http://localhost:{}/", getClass().getSimpleName(), PORT);
             result.complete();
           } else {
             LOG.error("Error starting HTTP server", startResult.cause());

@@ -3,17 +3,16 @@ package nl.bransom.marblerun;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava.core.AbstractVerticle;
-import io.vertx.rxjava.ext.web.Router;
-import io.vertx.rxjava.ext.web.RoutingContext;
-import io.vertx.rxjava.ext.web.client.HttpResponse;
-import io.vertx.rxjava.ext.web.client.WebClient;
-import io.vertx.rxjava.ext.web.codec.BodyCodec;
+import io.vertx.rxjava.core.eventbus.EventBus;
+import io.vertx.rxjava.core.eventbus.Message;
+import io.vertx.rxjava.core.http.HttpServerRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.Single;
 
 /**
- * Send a GET request to http://localhost:8081/ to trigger this microservice. It will invoke the HelloMicroservice twice and combine the responses.
+ * Send a GET request to http://localhost:8081/ to trigger this microservice.
+ * It will invoke the HelloMicroservice twice and combine the responses.
  */
 public class HelloConsumerMicroservice extends AbstractVerticle {
 
@@ -21,20 +20,13 @@ public class HelloConsumerMicroservice extends AbstractVerticle {
   private static final String HOST = "localhost";
   private static final int PORT = 8081;
 
-  private WebClient client;
-
   @Override
   public void start(final Future<Void> result) {
-    client = WebClient.create(vertx);
-
-    final Router router = Router.router(vertx);
-    router.get("/").handler(this::invokeMyFirstMicroservice);
-
     vertx.createHttpServer()
-        .requestHandler(router::accept)
+        .requestHandler(this::invokeService)
         .listen(PORT, startResult -> {
           if (startResult.succeeded()) {
-            LOG.info("running " + getClass().getSimpleName() + " on http://" + HOST + ":" + PORT + "/");
+            LOG.info("{} is listening on http://{}:{}/", getClass().getSimpleName(), HOST, PORT);
             result.complete();
           } else {
             result.fail(startResult.cause());
@@ -42,26 +34,34 @@ public class HelloConsumerMicroservice extends AbstractVerticle {
         });
   }
 
-  private void invokeMyFirstMicroservice(final RoutingContext routingContext) {
-    final Single<HttpResponse<JsonObject>> lukeSingle = client
-        .get(HelloMicroservice.PORT, HelloMicroservice.HOST, "/Luke")
-        .as(BodyCodec.jsonObject())
-        .rxSend();
-    final Single<HttpResponse<JsonObject>> leiaSingle = client
-        .get(HelloMicroservice.PORT, HelloMicroservice.HOST, "/Leia")
-        .as(BodyCodec.jsonObject())
-        .rxSend();
+  private void invokeService(final HttpServerRequest httpRequest) {
+    final EventBus eventBus = vertx.eventBus();
+
+    final Single<String> lukeSingle = eventBus
+        .<JsonObject>rxSend(HelloMicroservice.ADDRESS, "Luke")
+        .map(Message::body)
+        .map(this::composeResponse);
+    final Single<String> leiaSingle = eventBus
+        .<JsonObject>rxSend(HelloMicroservice.ADDRESS, "Leia")
+        .map(Message::body)
+        .map(this::composeResponse);
 
     Single.zip(lukeSingle, leiaSingle,
         (lukeResponse, leiaResponse) -> {
           // We have the result of both requests
           return new JsonObject()
-              .put("luke", lukeResponse.body().getString(HelloMicroservice.KEY))
-              .put("leia", leiaResponse.body().getString(HelloMicroservice.KEY));
+              .put("luke", lukeResponse)
+              .put("leia", leiaResponse);
         })
         .map(JsonObject::encodePrettily)
         .subscribe(
-            jsonResult -> routingContext.response().end(jsonResult),
-            t -> routingContext.response().end(new JsonObject().encodePrettily()));
+            httpRequest.response()::end,
+            t -> httpRequest.response()
+                .setStatusCode(500)
+                .end(t.getMessage()));
+  }
+
+  private String composeResponse(final JsonObject json) {
+    return json.getString(HelloMicroservice.MESSAGE_KEY) + " from " + json.getString(HelloMicroservice.SERVED_BY_KEY);
   }
 }

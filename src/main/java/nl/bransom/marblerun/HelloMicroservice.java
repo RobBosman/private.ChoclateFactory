@@ -2,44 +2,39 @@ package nl.bransom.marblerun;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
-import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.Router;
-import io.vertx.ext.web.RoutingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class HelloMicroservice extends AbstractVerticle {
 
-  static final String HOST = "localhost";
-  static final int PORT = 8080;
-  static final String KEY = "message";
+  static final String ADDRESS = "hello";
+  static final String MESSAGE_KEY = "message";
+  static final String SERVED_BY_KEY = "served-by";
   private static final Logger LOG = LoggerFactory.getLogger(HelloMicroservice.class);
 
   @Override
   public void start(final Future<Void> result) {
-    final Router router = Router.router(vertx);
-    router.get("/").handler(this::sayHello);
-    router.get("/:name").handler(this::sayHello);
-    vertx.createHttpServer()
-        .requestHandler(router::accept)
-        .listen(PORT, startResult -> {
-          if (startResult.succeeded()) {
-            LOG.info("running " + getClass().getSimpleName() + " on http://" + HOST + ":" + PORT + "/");
+    vertx
+        .eventBus()
+        .<String>consumer(ADDRESS,
+            message -> {
+              final JsonObject responseBody = new JsonObject()
+                  .put(SERVED_BY_KEY, this.toString());
+              // Check whether we have received a payload in the incoming message
+              if (message.body().isEmpty()) {
+                message.reply(responseBody.put(MESSAGE_KEY, "Hello"));
+              } else {
+                message.reply(responseBody.put(MESSAGE_KEY, "Hello " + message.body()));
+              }
+            })
+        .completionHandler(consumerResult -> {
+          if (consumerResult.succeeded()) {
+            LOG.info("{} is ready to consume events on '{}'", getClass().getSimpleName(), ADDRESS);
             result.complete();
           } else {
-            result.fail(startResult.cause());
+            result.fail(consumerResult.cause());
           }
         });
-  }
-
-  private void sayHello(final RoutingContext rc) {
-    final String nameParam = rc.pathParam("name");
-    final String message = "Hello" + (nameParam == null ? "" : " " + nameParam) + " on " + Thread.currentThread().getName();
-    rc.response()
-        .putHeader(HttpHeaders.CONTENT_TYPE, "application/json")
-        .end(new JsonObject()
-            .put(KEY, message)
-            .encode());
   }
 }
