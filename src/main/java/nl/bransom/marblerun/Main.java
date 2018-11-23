@@ -11,13 +11,12 @@ public class Main {
   private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
   public static void main(final String[] args) {
-    final Vertx vertx = Vertx.vertx();
+    final var vertx = Vertx.vertx();
 
     CompositeFuture
         .all(
             deployVerticle(vertx, HelloMicroservice.class.getName()),
-//            deployVerticle(vertx, HelloMicroservice.class.getName()),
-//            deployVerticle(vertx, HelloMicroservice.class.getName()),
+            deployVerticle(vertx, HelloMicroservice.class.getName()),
             deployVerticle(vertx, HelloConsumerMicroservice.class.getName()))
         .setHandler(result -> {
           if (result.succeeded()) {
@@ -27,7 +26,7 @@ public class Main {
           }
         });
 
-    // Log published messages only!
+    // NOTE - log published messages only!
 //    vertx.eventBus()
 //        .addInterceptor(context -> LOG.debug("EVENT '{}' = {}", context.message().address(), context.message().body()));
     vertx.setTimer(30000, timerId -> {
@@ -39,14 +38,13 @@ public class Main {
 
   private static Future<Void> deployVerticle(final Vertx vertx, final String verticleName) {
     final Future<Void> result = Future.future();
-    vertx.deployVerticle(verticleName,
-        deployResult -> {
-          if (deployResult.succeeded()) {
-            result.complete();
-          } else {
-            result.fail(deployResult.cause());
-          }
-        });
+    vertx.deployVerticle(verticleName, deployResult -> {
+      if (deployResult.succeeded()) {
+        result.complete();
+      } else {
+        result.fail(deployResult.cause());
+      }
+    });
     return result;
   }
 }

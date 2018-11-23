@@ -34,10 +34,10 @@ public class HelloConsumerMicroservice extends AbstractVerticle {
   }
 
   private void invokeService(final HttpServerRequest httpRequest) {
-    Single.zip(
+    Single.zip( // send the requests...
         rxSendMessage("Luke"),
         rxSendMessage("Leia"),
-        (lukeResponse, leiaResponse) -> { // combine both requests
+        (lukeResponse, leiaResponse) -> { // ...and combine the responses
           return new JsonObject()
               .put("luke", lukeResponse)
               .put("leia", leiaResponse);
@@ -45,9 +45,9 @@ public class HelloConsumerMicroservice extends AbstractVerticle {
         .map(JsonObject::encodePrettily)
         .subscribe(
             httpRequest.response()::end,
-            t -> httpRequest.response()
+            throwable -> httpRequest.response()
                 .setStatusCode(500)
-                .end(t.getMessage()));
+                .end(throwable.getMessage()));
   }
 
   private Single<String> rxSendMessage(final String body) {

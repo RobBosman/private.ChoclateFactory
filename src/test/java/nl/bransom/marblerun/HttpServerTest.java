@@ -1,7 +1,6 @@
 package nl.bransom.marblerun;
 
 import io.vertx.core.Vertx;
-import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestSuite;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +8,7 @@ class HttpServerTest {
 
   @Test
   void test() {
-    final Vertx vertx = Vertx.vertx();
+    final var vertx = Vertx.vertx();
     TestSuite
         .create("TestSuite")
         .before(testContext ->
@@ -17,7 +16,7 @@ class HttpServerTest {
                 .exceptionHandler(testContext.exceptionHandler())
                 .deployVerticle(HttpServer.class.getName(), testContext.asyncAssertSuccess()))
         .test("pingTest", testContext -> {
-          final Async async = testContext.async();
+          final var async = testContext.async();
           vertx
               .exceptionHandler(testContext.exceptionHandler())
               .createHttpClient()
