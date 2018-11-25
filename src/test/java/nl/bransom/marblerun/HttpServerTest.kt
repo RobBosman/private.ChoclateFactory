@@ -14,14 +14,14 @@ internal class HttpServerTest {
         .before { testContext ->
           vertx
               .exceptionHandler(testContext.exceptionHandler())
-              .deployVerticle(HttpServer::class.java.name, testContext.asyncAssertSuccess<String>())
+              .deployVerticle(HttpServer::class.java.name, testContext.asyncAssertSuccess())
         }
         .test("pingTest") { testContext ->
           val async = testContext.async()
           vertx
               .exceptionHandler(testContext.exceptionHandler())
               .createHttpClient()
-              .getNow(HttpServer.PORT, "localhost", "/") { response ->
+              .getNow(PORT, "localhost", "/") { response ->
                 response.handler { body ->
                   testContext.assertTrue(body.toString().contains("Hello from "))
                   async.complete()
