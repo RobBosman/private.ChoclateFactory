@@ -1,0 +1,8 @@
+#rain-intensity {
+  margin: 0 4em 1em 0.5em;
+  bottom: 0;
+  height: 10em;
+}
+#rain-intensity-value {
+  width: 10em;
+}
