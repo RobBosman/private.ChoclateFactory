@@ -1,4 +1,4 @@
-package nl.bransom.marblerun
+package nl.bransom.microservice
 
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.Future
@@ -9,7 +9,7 @@ const val PORT = 8080
 
 class HttpServer : AbstractVerticle() {
 
-  private val LOG = LoggerFactory.getLogger(javaClass)
+  private val log = LoggerFactory.getLogger(javaClass)
 
   override fun start(result: Future<Void>) {
     val router = Router.router(vertx)
@@ -17,7 +17,7 @@ class HttpServer : AbstractVerticle() {
     router.get("/").handler { routingContext ->
       routingContext
           .response()
-          .end("<h1>Hello from " + Thread.currentThread().name + "</h1>")
+          .end("<h1>Hello from ${Thread.currentThread().name}</h1>")
     }
 
     vertx
@@ -25,10 +25,10 @@ class HttpServer : AbstractVerticle() {
         .requestHandler(router::accept)
         .listen(PORT) { listenResult ->
           if (listenResult.succeeded()) {
-            LOG.info("Listening on http://localhost:{}/", PORT)
+            log.info("Listening on http://localhost:$PORT/")
             result.complete()
           } else {
-            LOG.error("Error starting HTTP server", listenResult.cause())
+            log.error("Error starting HTTP server ${listenResult.cause()}")
             result.fail(listenResult.cause())
           }
         }

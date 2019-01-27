@@ -1,10 +1,10 @@
-package nl.bransom.marblerun
+package nl.bransom.microservice
 
 import com.mongodb.client.model.Projections
 import com.mongodb.reactivestreams.client.MongoClients
 import com.mongodb.reactivestreams.client.Success
-import nl.bransom.marblerun.SubscriberHelpers.PrintDocumentSubscriber
-import nl.bransom.marblerun.SubscriberHelpers.PrintSubscriber
+import nl.bransom.microservice.SubscriberHelpers.PrintDocumentSubscriber
+import nl.bransom.microservice.SubscriberHelpers.PrintSubscriber
 import org.bson.Document
 import org.junit.jupiter.api.Test
 import rx.Observable
@@ -20,8 +20,8 @@ class ObservableTest {
     val mongoClient = MongoClients.create()
 
     val tracks = mongoClient
-        .getDatabase("marble-run")
-        .getCollection("tracks")
+        .getDatabase("microservice")
+        .getCollection("hello")
 
     val insertSubscriber = PrintSubscriber<Success>("OK")
     tracks
@@ -55,7 +55,7 @@ class ObservableTest {
     val uppercaseNames = ArrayList<String>()
 
     for (i in 0..24) {
-      val name = "collectionNumber$i"
+      val name = "collectionNumber $i"
       observers.add(toObservable(database?.createCollection(name)))
       uppercaseNames.add(name.toUpperCase())
     }

@@ -1,4 +1,4 @@
-package nl.bransom.marblerun
+package nl.bransom.microservice
 
 import com.mongodb.ConnectionString
 import com.mongodb.MongoCommandException
@@ -12,9 +12,10 @@ import rx.RxReactiveStreams
 import java.util.concurrent.TimeUnit.SECONDS
 
 object Fixture {
-  val DEFAULT_URI = "mongodb://localhost:27017"
-  val MONGODB_URI_SYSTEM_PROPERTY_NAME = "org.mongodb.test.uri"
-  val defaultDatabaseName = "JavaDriverReactiveTest"
+
+  const val DEFAULT_URI = "mongodb://localhost:27017"
+  const val MONGODB_URI_SYSTEM_PROPERTY_NAME = "org.mongodb.test.uri"
+  const val defaultDatabaseName = "JavaDriverReactiveTest"
 
   private var connectionString: ConnectionString? = null
   private var mongoClient: MongoClient? = null

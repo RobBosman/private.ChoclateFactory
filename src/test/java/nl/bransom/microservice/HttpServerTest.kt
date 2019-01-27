@@ -1,4 +1,4 @@
-package nl.bransom.marblerun
+package nl.bransom.microservice
 
 import io.vertx.core.Vertx
 import io.vertx.ext.unit.TestSuite

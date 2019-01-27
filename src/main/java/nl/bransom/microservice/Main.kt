@@ -1,13 +1,13 @@
-package nl.bransom.marblerun
+package nl.bransom.microservice
 
 import io.vertx.core.CompositeFuture
 import io.vertx.core.Future
 import io.vertx.rxjava.core.Vertx
 import org.slf4j.LoggerFactory
 
-private val LOG = LoggerFactory.getLogger("nl.bransom.marblerun.Main")
+private val log = LoggerFactory.getLogger("nl.bransom.microservice.Main")
 
-fun main(args: Array<String>) {
+fun main() {
   val vertx = Vertx.vertx()
 
   CompositeFuture
@@ -17,9 +17,9 @@ fun main(args: Array<String>) {
           deployVerticle(vertx, HelloConsumerMicroservice::class.java.name))
       .setHandler { result ->
         if (result.succeeded()) {
-          LOG.info("We have hyperdrive, captain.")
+          log.info("We have hyperdrive, captain.")
         } else {
-          LOG.error("Error", result.cause())
+          log.error("Error", result.cause())
         }
       }
 

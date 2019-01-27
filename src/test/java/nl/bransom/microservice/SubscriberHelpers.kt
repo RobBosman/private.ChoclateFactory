@@ -1,4 +1,4 @@
-package nl.bransom.marblerun
+package nl.bransom.microservice
 
 import com.mongodb.MongoTimeoutException
 import org.bson.Document

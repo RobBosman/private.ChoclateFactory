@@ -1,4 +1,4 @@
-package nl.bransom.marblerun
+package nl.bransom.microservice
 
 import io.vertx.core.Future
 import io.vertx.core.json.JsonObject
@@ -16,8 +16,8 @@ const val AT_KEY = "at"
 
 class HelloMicroservice : AbstractVerticle() {
 
-  private val DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
-  private val LOG = LoggerFactory.getLogger(javaClass)
+  private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
+  private val log = LoggerFactory.getLogger(javaClass)
 
   override fun start(result: Future<Void>) {
     val consumer = vertx.eventBus().consumer<String>(ADDRESS)
@@ -26,14 +26,14 @@ class HelloMicroservice : AbstractVerticle() {
         .toObservable()
         .subscribe(
             { message -> processMessageInChaos(message) },
-            { throwable -> LOG.error("Error processing message.", throwable) })
+            { throwable -> log.error("Error processing message.", throwable) })
 
     // This is just to update the result Future.
     consumer
         .rxCompletionHandler()
         .subscribe(
             {
-              LOG.info("Ready to consume messages on '{}'", ADDRESS)
+              log.info("Ready to consume messages on '$ADDRESS'")
               result.complete()
             },
             { throwable -> result.fail(throwable) })
@@ -44,15 +44,15 @@ class HelloMicroservice : AbstractVerticle() {
     when (Random().nextInt(3)) {
       0 -> {
         // Just do not reply, leading to a timeout on the consumer side.
-        LOG.debug("[{}] - Not replying", message.body())
+        log.debug("[${message.body()}] - Not replying")
       }
       1 -> {
         // Reply with a failure
-        LOG.debug("[{}] - Returning a failure", message.body())
+        log.debug("[${message.body()}] - Returning a failure")
         message.fail(500, "message processing failure")
       }
       else -> {
-        LOG.debug("[{}] - Returning success ================", message.body())
+        log.debug("[${message.body()}] - Returning success ================")
         processMessage(message)
       }
     }
@@ -61,13 +61,13 @@ class HelloMicroservice : AbstractVerticle() {
   private fun processMessage(message: Message<String>) {
     val responseBody = JsonObject()
         .put(SERVED_BY_KEY, this.toString())
-        .put(AT_KEY, LocalDateTime.now().format(DATE_FORMATTER))
+        .put(AT_KEY, LocalDateTime.now().format(dateFormatter))
 
     // Check whether we have received a payload in the incoming message
     if (message.body().isEmpty()) {
       message.reply(responseBody.put(MESSAGE_KEY, "Hello"))
     } else {
-      message.reply(responseBody.put(MESSAGE_KEY, "Hello " + message.body()))
+      message.reply(responseBody.put(MESSAGE_KEY, "Hello ${message.body()}"))
     }
   }
 }

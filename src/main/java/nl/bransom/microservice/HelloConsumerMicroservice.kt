@@ -1,4 +1,4 @@
-package nl.bransom.marblerun
+package nl.bransom.microservice
 
 import io.vertx.core.Future
 import io.vertx.core.json.JsonObject
@@ -9,15 +9,16 @@ import org.slf4j.LoggerFactory
 import rx.Single
 import java.util.concurrent.TimeUnit
 
+const val CONSUMER_HOST = "localhost"
+const val CONSUMER_PORT = 8081
+
 /**
  * Send a GET request to http://localhost:8081/ to trigger this microservice.
  * It will invoke the HelloMicroservice twice and combine the responses.
  */
-class HelloConsumerMicroservice : AbstractVerticle() {
+object HelloConsumerMicroservice : AbstractVerticle() {
 
-  private val LOG = LoggerFactory.getLogger(javaClass)
-  private val HOST = "localhost"
-  private val PORT = 8081
+  private val log = LoggerFactory.getLogger(javaClass)
 
   override fun start(result: Future<Void>) {
     val router = Router.router(vertx)
@@ -27,9 +28,9 @@ class HelloConsumerMicroservice : AbstractVerticle() {
     vertx
         .createHttpServer()
         .requestHandler(router::accept)
-        .listen(PORT) { startResult ->
+        .listen(CONSUMER_PORT) { startResult ->
           if (startResult.succeeded()) {
-            LOG.info("Listening on http://{}:{}/", HOST, PORT)
+            log.info("Listening on http://$CONSUMER_HOST:$CONSUMER_PORT/")
             result.complete()
           } else {
             result.fail(startResult.cause())
@@ -38,7 +39,7 @@ class HelloConsumerMicroservice : AbstractVerticle() {
   }
 
   private fun invokeService(routingContext: RoutingContext) {
-    LOG.debug("Processing HTTP request")
+    log.debug("Processing HTTP request")
 
     // Send the request messages...
     val lukeSingle = rxSendMessage("Luke")
