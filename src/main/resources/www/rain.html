@@ -4,27 +4,27 @@
   <title>Reactive Rain</title>
   <link href='https://fonts.googleapis.com/css?family=Raleway:500' rel='stylesheet' type='text/css'>
   <link href='https://fonts.googleapis.com/css?family=Cousine' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" type="text/css" href="/css/nouislider.min.css">
+  <link href="/css/nouislider.min.css" rel="stylesheet" type="text/css">
   <script src="//cdn.jsdelivr.net/sockjs/1.0.3/sockjs.min.js"></script>
   <script src="/js/vertx-eventbus-3.2.1.js"></script>
   <script src="/js/nouislider.min.js"></script>
 
-  <link rel="stylesheet" type="text/css" href="/css/tile-with-rain-drops.css">
-  <link rel="stylesheet" type="text/css" href="/css/rain-intensity.css">
-  <link rel="stylesheet" type="text/css" href="/css/randomness-statistics.css">
-  <link rel="stylesheet" type="text/css" href="/css/pi-approximation.css">
-  <link rel="stylesheet" type="text/css" href="/css/rain.css">
+  <link href="/css/tile-with-rain-drops.css" rel="stylesheet" type="text/css">
+  <link href="/css/rain-intensity.css" rel="stylesheet" type="text/css">
+  <link href="/css/randomness-statistics.css" rel="stylesheet" type="text/css">
+  <link href="/css/pi-approximation.css" rel="stylesheet" type="text/css">
+  <link href="/css/rain.css" rel="stylesheet" type="text/css">
 </head>
 <body>
 <h1>Reactive Rain in Monte Carlo</h1>
 
-<div id="tile-with-rain-drops" class="main">
-  <svg xmlns="http://www.w3.org/2000/svg" id="tile-with-rain-drops-svg"></svg>
+<div class="main" id="tile-with-rain-drops">
+  <svg id="tile-with-rain-drops-svg" xmlns="http://www.w3.org/2000/svg"></svg>
 </div>
 
-<div id="rain-intensity" class="main"></div>
+<div class="main" id="rain-intensity"></div>
 
-<div id="rain-intensity-value" class="main">
+<div class="main" id="rain-intensity-value">
   <table width="100%">
     <tr>
       <td>rain intensity</td>
@@ -36,7 +36,7 @@
   </table>
 </div>
 
-<div id="pi-approximation" class="main">
+<div class="main" id="pi-approximation">
   <table width="100%">
     <tr>
       <td>total number of drops</td>
@@ -59,7 +59,7 @@
   </table>
 </div>
 
-<div id="randomness-statistics" class="main">
+<div class="main" id="randomness-statistics">
   <table width="100%">
     <tr>
       <td>average x</td>

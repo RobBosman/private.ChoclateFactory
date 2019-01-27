@@ -16,7 +16,7 @@ class RainMaker : AbstractVerticle() {
         .toObservable()
         .map<JsonObject> { it.body() }
         .map { jsonObject -> jsonObject.getDouble(RainConstants.VALUE_KEY) }
-        .map<Long>  { intensityToIntervalMillis(it) }
+        .map<Long> { intensityToIntervalMillis(it) }
         .switchMap { this.createRainDropObservable(it) }
         .map { it.toJson() }
         .subscribe(
