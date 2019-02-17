@@ -2,7 +2,7 @@
 
 function RandomnessStatistics() {
 
-  var numRainDrops = 0;
+  var numPeanuts = 0;
   var sumX = 0.0;
   var sumY = 0.0;
   var sumDeviationXY = 0.0;
@@ -10,22 +10,22 @@ function RandomnessStatistics() {
   var sumSquaredDeviationY = 0.0;
 
   this.updateDropCounter = function(err, msg) {
-    numRainDrops++;
+    numPeanuts++;
   };
 
   this.updateAverageX = function(err, msg) {
     sumX += msg.body.x;
-    document.getElementById('average-x').innerHTML = (sumX / numRainDrops).toFixed(16);
+    document.getElementById('average-x').innerHTML = (sumX / numPeanuts).toFixed(16);
   };
 
   this.updateAverageY = function(err, msg) {
     sumY += msg.body.y;
-    document.getElementById('average-y').innerHTML = (sumY / numRainDrops).toFixed(16);
+    document.getElementById('average-y').innerHTML = (sumY / numPeanuts).toFixed(16);
   };
 
   this.updateCorrelation = function(err, msg) {
-    var averageX = sumX / numRainDrops;
-    var averageY = sumY / numRainDrops;
+    var averageX = sumX / numPeanuts;
+    var averageY = sumY / numPeanuts;
     var deviationX = msg.body.x - averageX;
     var deviationY = msg.body.y - averageY;
     sumDeviationXY += deviationX * deviationY;

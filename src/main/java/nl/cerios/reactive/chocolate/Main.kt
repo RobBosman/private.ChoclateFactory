@@ -1,20 +1,20 @@
-package nl.bransom.microservice
+package nl.cerios.reactive.chocolate
 
 import io.vertx.core.CompositeFuture
 import io.vertx.core.Future
 import io.vertx.rxjava.core.Vertx
 import org.slf4j.LoggerFactory
 
-private val log = LoggerFactory.getLogger("nl.bransom.microservice.Main")
+private val log = LoggerFactory.getLogger("nl.cerios.reactive.chocolate.Main")
 
 fun main() {
   val vertx = Vertx.vertx()
 
   CompositeFuture
       .all(
-          deployVerticle(vertx, HelloMicroservice::class.java.name),
-          deployVerticle(vertx, HelloMicroservice::class.java.name),
-          deployVerticle(vertx, HelloConsumerMicroservice::class.java.name))
+          deployVerticle(vertx, PeanutProducer::class.java.name),
+          deployVerticle(vertx, PeanutSpeedMonitor::class.java.name),
+          deployVerticle(vertx, HttpEventServer::class.java.name))
       .setHandler { result ->
         if (result.succeeded()) {
           log.info("We have hyperdrive, captain.")
@@ -23,13 +23,13 @@ fun main() {
         }
       }
 
-  // NOTE - do NOT log 'sent' messages; only log 'published' messages!
+// NOTE - do not log (and swallow!) messages that are 'sent'; only log messages that are 'published'!
 //  vertx
 //      .eventBus()
-//      .addInterceptor { context -> LOG.debug("EVENT '{}' = {}", context.message().address(), context.message().body()) }
+//      .addInterceptor { context -> log.debug("EVENT '{}' = {}", context.message().address(), context.message().body()) }
 //  vertx.setTimer(30000) {
 //    vertx.close()
-//    LOG.info("And... it's gone!")
+//    log.info("And... it's gone!")
 //    System.exit(0)
 //  }
 }

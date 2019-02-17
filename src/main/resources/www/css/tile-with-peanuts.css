@@ -1,14 +1,14 @@
-#tile-with-rain-drops {
+#tile-with-peanuts {
   width: 40%;
   display: inline-block;
   position: relative;
 }
-#tile-with-rain-drops:after {
+#tile-with-peanuts:after {
   padding-top: 100%;
   display: block;
   content: '';
 }
-#tile-with-rain-drops-svg {
+#tile-with-peanuts-svg {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -19,7 +19,7 @@
   width: 100%;
   height: 100%;
 }
-#tile-with-rain-drops-svg circle {
+#tile-with-peanuts-svg circle {
   fill: aqua;
   opacity: 0.0;
   animation-name: fade_opacity;

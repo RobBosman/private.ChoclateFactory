@@ -1,4 +1,4 @@
-package nl.bransom.marblerun
+package nl.cerios.reactive.chocolate
 
 import io.vertx.core.Future
 import io.vertx.ext.bridge.PermittedOptions
@@ -9,9 +9,10 @@ import io.vertx.rxjava.ext.web.handler.StaticHandler
 import io.vertx.rxjava.ext.web.handler.sockjs.SockJSHandler
 import org.slf4j.LoggerFactory
 
-class RainServer : AbstractVerticle() {
+class HttpEventServer : AbstractVerticle() {
 
   private val log = LoggerFactory.getLogger(javaClass)
+  private val serverPort = 8080
 
   override fun start(futureResult: Future<Void>) {
 
@@ -20,19 +21,19 @@ class RainServer : AbstractVerticle() {
     router.route("/eventbus/*")
         .handler(SockJSHandler.create(vertx)
             .bridge(BridgeOptions()
-                .addInboundPermitted(PermittedOptions().setAddress(RainConstants.RAIN_INTENSITY_GET_ADDRESS))
-                .addInboundPermitted(PermittedOptions().setAddress(RainConstants.RAIN_INTENSITY_SET_ADDRESS))
-                .addOutboundPermitted(PermittedOptions().setAddress(RainConstants.RAIN_DROP_NOTIFY_ADDRESS))
-                .addOutboundPermitted(PermittedOptions().setAddress(RainConstants.RAIN_INTENSITY_SET_ADDRESS))))
+                .addInboundPermitted(PermittedOptions().setAddress("peanut.speed.get"))
+                .addInboundPermitted(PermittedOptions().setAddress("peanut.speed.set"))
+                .addOutboundPermitted(PermittedOptions().setAddress("peanut.notify"))
+                .addOutboundPermitted(PermittedOptions().setAddress("peanut.speed.set"))))
 
     router.route()
-        .handler(StaticHandler.create("www").setIndexPage("rain.html"))
+        .handler(StaticHandler.create("www").setIndexPage("chocolateFactory.html"))
 
     vertx.createHttpServer()
-        .requestHandler { router.accept(it) }
-        .listen(RainConstants.SERVER_PORT) { result ->
+        .requestHandler(router)
+        .listen(serverPort) { result ->
           if (result.succeeded()) {
-            log.info("Server is now listening on http://localhost:${RainConstants.SERVER_PORT}/")
+            log.info("Server is listening on http://localhost:$serverPort/")
             futureResult.complete()
           } else {
             futureResult.fail(result.cause())

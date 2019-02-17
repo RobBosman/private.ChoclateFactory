@@ -1,14 +1,14 @@
 "use strict";
 
-function RainIntensity() {
+function PeanutSpeed() {
 
   var ID = Math.random().toFixed(10);
-  var rainIntensitySlider;
+  var peanutSpeedSlider;
   var isSuppressingUpdates = true;
 
   this.initializeSlider = function() {
-    rainIntensitySlider = document.getElementById('rain-intensity');
-    noUiSlider.create(rainIntensitySlider, {
+    peanutSpeedSlider = document.getElementById('peanut-speed');
+    noUiSlider.create(peanutSpeedSlider, {
         start: 0,
         orientation: 'vertical',
         direction: 'rtl',
@@ -17,9 +17,9 @@ function RainIntensity() {
       }
     });
 
-    rainIntensitySlider.noUiSlider.on('update', function(values, handle) {
+    peanutSpeedSlider.noUiSlider.on('update', function(values, handle) {
       if (!isSuppressingUpdates) {
-        eventBus.publish('rain.intensity.set',
+        eventBus.publish('peanut.speed.set',
           { 'value': values[handle] / 100.0 },
           { 'id': ID });
       }
@@ -29,12 +29,12 @@ function RainIntensity() {
     whenSliderIsReady.completed();
   };
 
-  this.updateRainIntensity = function(err, msg) {
+  this.updatePeanutSpeed = function(err, msg) {
     var intensityPercentage = 100.0 * msg.body.value;
-    document.getElementById('rain-intensity-percentage').innerHTML = intensityPercentage.toFixed(0) + "%";
+    document.getElementById('peanut-speed-percentage').innerHTML = intensityPercentage.toFixed(0) + "%";
     if (msg.headers == null || msg.headers.id != ID) {
       isSuppressingUpdates = true;
-      rainIntensitySlider.noUiSlider.set(intensityPercentage);
+      peanutSpeedSlider.noUiSlider.set(intensityPercentage);
       isSuppressingUpdates = false;
     }
   };

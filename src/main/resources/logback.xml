@@ -3,20 +3,21 @@
   <!-- suppress printing logback status -->
   <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
 
-  <!-- define STDOUT as console output -->
-  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+  <!-- define CONSOLE as console output -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
     <layout class="ch.qos.logback.classic.PatternLayout">
-      <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
+      <!-- see https://logback.qos.ch/manual/layouts.html -->
+      <Pattern>%d{HH:mm:ss.SSS} [%32thread] %-32logger{0} %.-1level - %msg%n%ex{2}</Pattern>
     </layout>
   </appender>
 
-  <logger name="nl.bransom" level="DEBUG" additivity="false">
-    <appender-ref ref="STDOUT"/>
+  <logger name="nl.cerios.reactive" level="DEBUG" additivity="false">
+    <appender-ref ref="CONSOLE"/>
   </logger>
 
   <!-- set default log level and appender -->
   <root level="ERROR">
-    <appender-ref ref="STDOUT"/>
+    <appender-ref ref="CONSOLE"/>
   </root>
 
 </configuration>
